@@ -9,7 +9,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<GamingBacklogContext>(option => option.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
     ));
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    }); 
 
 
 var app = builder.Build();
