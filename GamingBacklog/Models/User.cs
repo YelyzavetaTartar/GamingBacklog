@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace GamingBacklog.Models
 {
@@ -11,17 +12,16 @@ namespace GamingBacklog.Models
 
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Введіть ім'я користувача")]
-        [Display(Name = "Ім'я")]
-        public string Username { get; set; }
+        [Display(Name = "Ім'я користувача")]
+        public string? Username { get; set; }
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Required]
-        public string PasswordHash { get; set; }
+        public string? PasswordHash { get; set; }
 
-        public virtual ICollection<UserBacklog> BacklogEntries { get; set; }
+        public virtual ICollection<UserBacklog>? BacklogEntries { get; set; }
     }
 }

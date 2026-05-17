@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GamingBacklog Genre</title>
+    <link rel="stylesheet" href="css/site.css" />
+</head>
+<body>
+    <h1>GamingBacklog</h1>
+    <h2>Genre</h2>
+
+    <h3>Add Genre</h3>
+    <form action="javascript:void(0);" method="POST" onsubmit="addGenre()">
+        <input type="text" id="add-genre-name" placeholder="Genre name">
+        <input type="submit" value="Add">
+    </form>
+
+    <div id="editGenre" style="display:none;">
+        <h3>Edit Genre</h3>
+        <form action="javascript:void(0);" onsubmit="updateGenre()">
+            <input type="hidden" id="edit-genre-id">
+            <input type="text" id="edit-genre-name">
+            <input type="submit" value="Save">
+            <a onclick="closeInput()" style="cursor:pointer;">&#10006;</a>
+        </form>
+    </div>
+
+    <p id="counter"></p>
+
+    <table>
+        <tr>
+            <th>Genre name</th>
+            <th colspan="2"></th>
+        </tr>
+        <tbody id="genres"></tbody>
+    </table>
+
+    <script src="js/genres.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        getGenres();
+    </script>
+</body>
+</html>

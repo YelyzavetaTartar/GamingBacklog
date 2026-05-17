@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Мій Беклог - Керування</title>
+    <link rel="stylesheet" href="css/site.css" />
+    <style>
+        select, input {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .rating-input {
+            width: 50px;
+        }
+
+        /* Контейнер для зірок */
+        .star-rating {
+            font-size: 20px;
+            color: #ddd;
+            display: inline-block;
+            position: relative;
+        }
+
+        /* Стиль для повної зірки */
+        .star-full {
+            color: #ffc107; 
+        }
+
+        /* Стиль для половинки зірки */
+        .star-half {
+            position: relative;
+            display: inline-block;
+        }
+
+            .star-half::after {
+                content: '★'; 
+                color: #ffc107;
+                position: absolute;
+                left: 0;
+                width: 50%; 
+                overflow: hidden;
+            }
+
+        /* Фон, який закриває все інше */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        /* коробочка по центру */
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-btns {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-yes {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-no {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-yes:hover {
+            background: #c82333;
+        }
+
+        .btn-no:hover {
+            background: #5a6268;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--card-bg); 
+            border: 2px dashed #333;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            filter: grayscale(1);
+            opacity: 0.5;
+        }
+
+        .empty-state h2 {
+            margin: 0 0 10px 0;
+            color: #fff;
+        }
+
+        .empty-state p {
+            color: #888;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo"><strong>GamingBacklog</strong></div>
+    </nav>
+
+
+    <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 20px; border-bottom: 1px solid #ddd;">
+        <h2 style="margin: 0;">Вітаємо, <span id="user-name" style="color: #007bff;"></span>!</h2>
+        <button onclick="logout()" style="background: #dc3545; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px;">
+            Вийти з акаунту
+        </button>
+    </div>
+
+    <h1 style="color: white;">Мій беклог ігор</h1>
+
+    <div style="background: #f4f4f4; padding: 15px; border-radius: 8px;">
+        <h3>Додати гру до списку</h3>
+        <form action="javascript:void(0);" onsubmit="addBacklogItem()">
+            <input type="text" id="add-game-title" placeholder="Назва гри" required>
+
+            <select id="sel-genre" required><option value="">Виберіть жанр</option></select>
+            <select id="sel-platform" required><option value="">Виберіть платформу</option></select>
+            <select id="sel-status" required><option value="">Виберить статус</option></select>
+
+            <input type="number" id="add-interest" placeholder="На скільки цікава гри? (1-5)" min="1" max="5" required style="width: 190px;">
+            <input type="submit" value="Додати в беклог" style="background: #28a745; color: white; border: none; padding: 8px 15px; cursor: pointer;">
+        </form>
+    </div>
+
+    <!-- Панель фільтрації (Реалізація стрілочок extend з діаграми) -->
+    <div style="background: #e9ecef; padding: 15px; border-radius: 8px; margin-top: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <strong>Фільтрувати за:</strong>
+
+        <select id="filter-genre"><option value="">Усі жанри</option></select>
+        <select id="filter-platform"><option value="">Усі платформи</option></select>
+        <select id="filter-status"><option value="">Усі статуси</option></select>
+
+        <select id="filter-interest">
+            <option value="">Будь-яка цікавість</option>
+            <option value="5">5</option>
+            <option value="4">4</option>
+            <option value="3">3</option>
+            <option value="2">2</option>
+            <option value="1">1</option>
+        </select>
+
+        <button onclick="applyFilter()" style="background: #007bff; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px;">Застосувати</button>
+        <button onclick="resetFilter()" style="background: #6c757d; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px;">Скинути</button>
+    </div>
+
+    <!-- Форма редагування (прихована) -->
+    <div id="editBacklog" style="display:none; background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid #ffeeba;">
+        <h3>Змінити дані про гру</h3>
+        <form action="javascript:void(0);" onsubmit="updateBacklogItem()">
+            <input type="hidden" id="edit-id">
+
+            <label>Жанр:</label>
+            <select id="edit-genre"></select>
+
+            <label>Платформа:</label>
+            <select id="edit-platform"></select>
+
+            <label>Статус:</label>
+            <select id="edit-status"></select>
+
+            <label>Рейтинг цікавості (1-5):</label>
+            <input type="number" id="edit-interest" min="1" max="5">
+
+            <label>Оцінка гри (1-10):</label>
+            <input type="number" id="edit-score" min="1" max="10">
+
+            <br><br>
+            <input type="submit" value="Зберегти зміни" style="background: #ffc107; border: none; padding: 8px 15px; cursor: pointer;">
+            <button type="button" onclick="closeEditForm()">Скасувати</button>
+        </form>
+    </div>
+
+    <!-- Форма швидкої зміни статусу (прихована за замовчуванням) -->
+    <div id="statusUpdateDiv" style="display:none; background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid #2196f3;">
+        <h3>Оновити статус проходження гри</h3>
+        <input type="hidden" id="quick-status-id">
+
+        <label>Оберіть новий статус:</label>
+        <select id="quick-sel-status" style="padding: 5px; margin-right: 10px;"></select>
+
+        <button onclick="saveQuickStatus()" style="background: #2196f3; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px;">Оновити</button>
+        <button onclick="document.getElementById('statusUpdateDiv').style.display='none'" style="padding: 8px 15px; cursor: pointer; border-radius: 4px;">Скасувати</button>
+    </div>
+
+    <p id="counter"></p>
+
+    <!-- Повідомлення про порожній список -->
+    <div id="empty-state" style="display:none; text-align: center; padding: 50px; background: white; margin: 30px; border-radius: 10px; border: 2px dashed #ccc;">
+        <div style="font-size: 50px; margin-bottom: 10px;">🎮</div>
+        <h2 style="color: #666;">У вас ще немає ігор у списку</h2>
+        <p style="color: #999;">Додайте першу гру за допомогою форми вище!</p>
+    </div>
+
+    <!-- Таблиця -->
+    <table id="backlog-table">
+        <thead>
+            <tr>
+                <th>Гра</th>
+                <th>Жанр</th>
+                <th>Платформа</th>
+                <th>Статус</th>
+                <th>Рейтинг цікавості</th>
+                <th>Оцінка гри</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody id="backlog-list"></tbody>
+    </table>
+
+    <!-- Форма швидкого оцінювання (прихована) -->
+    <div id="ratingUpdateDiv" style="display:none; background: #fffde7; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid #fbc02d;">
+        <h3>Оцінити гру</h3>
+        <input type="hidden" id="quick-rating-id">
+
+        <label>Ваша оцінка від 1 до 10:</label>
+        <input type="number" id="quick-rate-value" min="1" max="10" style="width: 60px; padding: 5px; margin-right: 10px;">
+
+        <button onclick="saveQuickRating()" style="background: #fbc02d; color: black; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-weight: bold;">Зберегти оцінку</button>
+        <button onclick="document.getElementById('ratingUpdateDiv').style.display='none'" style="padding: 8px 15px; cursor: pointer; border-radius: 4px; margin-left: 5px;">Скасувати</button>
+    </div>
+
+    <!-- Модальне вікно виходу -->
+    <div id="logoutModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <h3>Підтвердження виходу</h3>
+            <p>Ви дійсно хочете вийти з акаунту?</p>
+            <div class="modal-btns">
+                <button onclick="confirmLogout()" class="btn-yes">Так, вийти</button>
+                <button onclick="closeLogoutModal()" class="btn-no">Скасувати</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальне вікно підтвердження видалення -->
+    <div id="deleteModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <div style="font-size: 50px; color: #dc3545; margin-bottom: 10px;">🗑️</div>
+            <h3 style="color: #333;">Видалити гру?</h3>
+            <p style="color: #666;">Ви впевнені, що хочете видалити цю гру зі свого беклогу?</p>
+
+            <!-- Приховане поле для зберігання ID гри, яку треба видалити -->
+            <input type="hidden" id="delete-item-id">
+
+            <div class="modal-btns">
+                <button onclick="confirmDelete()" class="btn-yes">Так, видалити</button>
+                <button onclick="closeDeleteModal()" class="btn-no">Скасувати</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/backlog.js"></script>
+    <script>
+        // Завантажуємо дані для випадаючих списків та сам беклог
+        initializePage();
+    </script>
+</body>
+</html>

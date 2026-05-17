@@ -1,5 +1,6 @@
 ﻿using GamingBacklog.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace GamingBacklog.Models
 {
@@ -21,10 +22,10 @@ namespace GamingBacklog.Models
         [Range(1, 10)]
         public int? FinalScore { get; set; } 
 
-        public virtual User User { get; set; }
-        public virtual Game Game { get; set; }
-        public virtual Genre Genre { get; set; }
-        public virtual Platform Platform { get; set; }
-        public virtual Status Status { get; set; }
+        public virtual User? User { get; set; }
+        public virtual Game? Game { get; set; }
+        public virtual Genre? Genre { get; set; }
+        public virtual Platform? Platform { get; set; }
+        public virtual Status? Status { get; set; }
     }
 }
