@@ -83,37 +83,46 @@ function getBacklog() {
 
 // 3. ДОДАТИ ГРУ (Прецедент: Додати гру до списку)
 async function addBacklogItem() {
-    const title = document.getElementById('add-game-title').value;
+    const titleInput = document.getElementById('add-game-title');
+    const title = titleInput.value.trim();
+    const gId = document.getElementById('sel-genre').value;
+    const pId = document.getElementById('sel-platform').value;
+    const sId = document.getElementById('sel-status').value;
+    const interest = document.getElementById('add-interest').value;
+
+    if (!title || !gId || !pId || !sId || !interest) {
+        alert("Будь ласка, заповніть усі поля!");
+        return;
+    }
+
+    const activeUserId = parseInt(localStorage.getItem('userId'));
+
+    const requestData = {
+        gameTitle: title, 
+        userId: activeUserId,
+        genreId: parseInt(gId),
+        platformId: parseInt(pId),
+        statusId: parseInt(sId),
+        interestLevel: parseInt(interest)
+    };
 
     try {
-        // Створюємо гру в загальному каталозі Games
-        const gameRes = await fetch(uriGames, {
+        const response = await fetch(uriBacklog, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: title, description: "Додано через беклог" })
-        });
-        const newGame = await gameRes.json();
-
-        // Додаємо запис у User_Backlog з отриманим gameId
-        const backlogItem = {
-            userId: currentUserId,
-            gameId: newGame.id,
-            genreId: parseInt(document.getElementById('sel-genre').value),
-            platformId: parseInt(document.getElementById('sel-platform').value),
-            statusId: parseInt(document.getElementById('sel-status').value),
-            interestLevel: parseInt(document.getElementById('add-interest').value)
-        };
-
-        await fetch(uriBacklog, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(backlogItem)
+            body: JSON.stringify(requestData)
         });
 
-        document.getElementById('add-game-title').value = '';
-        getBacklog();
+        if (response.ok) {
+            titleInput.value = '';
+            document.getElementById('add-interest').value = '';
+            getBacklog();
+        } else {
+            const errorMsg = await response.text();
+            showInfoModal(errorMsg); 
+        }
     } catch (error) {
-        console.error('Помилка при додаванні.', error);
+        console.error('Помилка:', error);
     }
 }
 
@@ -248,6 +257,15 @@ function closeDeleteModal() {
     document.getElementById('deleteModal').style.display = 'none';
 }
 
+function showInfoModal(message) {
+    document.getElementById('infoModalMessage').innerText = message;
+    document.getElementById('infoModal').style.display = 'flex';
+}
+
+function closeInfoModal() {
+    document.getElementById('infoModal').style.display = 'none';
+}
+
 async function confirmDelete() {
     const id = document.getElementById('delete-item-id').value;
 
@@ -338,13 +356,14 @@ async function applyFilter() {
     const interest = document.getElementById('filter-interest').value;
 
     let queryParams = [];
+
+    // Додаємо UserId, щоб фільтрувати тільки свої ігри
+    queryParams.push(`userId=${currentUserId}`); 
+
     if (genreId) queryParams.push(`genreId=${genreId}`);
     if (platformId) queryParams.push(`platformId=${platformId}`);
     if (statusId) queryParams.push(`statusId=${statusId}`);
     if (interest) queryParams.push(`interestLevel=${interest}`);
-
-    // Додаємо UserId, щоб фільтрувати тільки свої ігри
-    queryParams.push(`userId=${currentUserId}`);
 
     const url = `${uriBacklog}/filter?${queryParams.join('&')}`;
 

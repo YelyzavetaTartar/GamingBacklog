@@ -294,6 +294,19 @@
         </div>
     </div>
 
+    <!-- Модальне вікно для повідомлень/помилок -->
+    <div id="infoModal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <div style="font-size: 50px; color: #ffc107; margin-bottom: 10px;">⚠️</div>
+            <h3 style="color: #333;">Увага</h3>
+            <p id="infoModalMessage" style="color: #666; font-size: 16px; margin-bottom: 20px;"></p>
+            <div class="modal-btns">
+                <!-- Використовуємо ваш існуючий клас кнопки btn-no або btn-ok -->
+                <button onclick="closeInfoModal()" class="btn-no" style="width: 100%;">Зрозуміло</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/backlog.js"></script>
     <script>
         // Завантажуємо дані для випадаючих списків та сам беклог

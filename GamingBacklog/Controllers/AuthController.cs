@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GamingBacklog.Models;
+using BCrypt.Net;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -73,6 +74,7 @@ public class AuthController : ControllerBase
         {
             return BadRequest("Користувач з такою поштою вже існує");
         }
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -89,11 +91,11 @@ public class AuthController : ControllerBase
             return BadRequest("Введіть логін та пароль");
         }
 
-        // Шукаємо користувача за поштою та паролем
+        // Шукаємо користувача за поштою
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email == loginData.Email && u.PasswordHash == loginData.PasswordHash);
+           .FirstOrDefaultAsync(u => u.Email == loginData.Email);
 
-        if (user == null)
+        if (user == null|| !BCrypt.Net.BCrypt.Verify(loginData.PasswordHash, user.PasswordHash))
         {
             return Unauthorized("Невірний логін або пароль");
         }

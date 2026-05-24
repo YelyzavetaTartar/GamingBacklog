@@ -13,10 +13,10 @@ namespace GamingBacklog.Models
 
         [Required]
         [Display(Name = "Назва гри")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public virtual ICollection<UserBacklog> BacklogEntries { get; set; }
+        public virtual ICollection<UserBacklog>? BacklogEntries { get; set; }
     }
 }
